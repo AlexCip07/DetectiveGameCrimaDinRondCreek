@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat RO-RO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'bg-primary': '#0a0a0f',
+                        'bg-secondary': '#12121a',
+                        'bg-tertiary': '#1a1a25',
+                        'accent': '#ff6b4a',
+                        'accent-glow': 'rgba(255, 107, 74, 0.3)',
+                        'text-primary': '#f5f5f7',
+                        'text-secondary': '#8b8b9e',
+                        'border-custom': 'rgba(255, 255, 255, 0.08)',
+                        'message-other': '#1e1e2a',
+                        'success': '#4ade80',
+                    },
+                    fontFamily: {
+                        'outfit': ['Outfit', 'sans-serif'],
+                        'mono': ['JetBrains Mono', 'monospace'],
+                    },
+                    animation: {
+                        'spin-slow': 'spin 1s linear infinite',
+                        'pulse-dot': 'pulseDot 1.4s ease-in-out infinite',
+                        'typing': 'typing 1.4s ease-in-out infinite',
+                        'message-in': 'messageIn 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+                        'fade-in': 'fadeIn 0.3s ease-out',
+                    },
+                    keyframes: {
+                        pulseDot: {
+                            '0%, 60%, 100%': { opacity: '0.3', transform: 'scale(0.8)' },
+                            '30%': { opacity: '1', transform: 'scale(1)' },
+                        },
+                        typing: {
+                            '0%, 60%, 100%': { transform: 'translateY(0)' },
+                            '30%': { transform: 'translateY(-6px)' },
+                        },
+                        messageIn: {
+                            'from': { opacity: '0', transform: 'translateY(10px)' },
+                            'to': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        fadeIn: {
+                            'from': { opacity: '0', transform: 'translateY(5px)' },
+                            'to': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            background-image: 
+                radial-gradient(ellipse at 20% 20%, rgba(255, 107, 74, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(138, 107, 255, 0.06) 0%, transparent 50%),
+                linear-gradient(180deg, #0a0a0f 0%, #0d0d14 100%);
+        }
+        .intro-bg {
+            background-image: radial-gradient(ellipse at 50% 50%, rgba(255, 107, 74, 0.1) 0%, transparent 60%);
+        }
+        .message-user-gradient {
+            background: linear-gradient(135deg, #ff6b4a 0%, #ff8a6b 100%);
+        }
+        .progress-gradient {
+            background: linear-gradient(90deg, #ff6b4a, #4ade80);
+        }
+        .scrollbar-thin::-webkit-scrollbar { width: 6px; }
+        .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+        .scrollbar-thin::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.08); border-radius: 3px; }
+        
+        .dot-1 { animation-delay: 0s; }
+        .dot-2 { animation-delay: 0.2s; }
+        .dot-3 { animation-delay: 0.4s; }
+        
+        .typing-dot-1 { animation-delay: 0s; }
+        .typing-dot-2 { animation-delay: 0.2s; }
+        .typing-dot-3 { animation-delay: 0.4s; }
+
+        .choice-btn {
+            transition: all 0.2s ease;
+        }
+        .choice-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 107, 74, 0.2);
+        }
+        .choice-btn:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="font-outfit bg-bg-primary text-text-primary min-h-screen flex justify-center items-center p-5">
+    
+    <!-- INTRO SCREEN -->
+    <div id="introScreen" class="intro-bg fixed inset-0 bg-bg-primary flex flex-col justify-center items-center z-50 transition-all duration-700">
+        
+        <!-- Lock Icon with Spinner -->
+        <div id="introIcon" class="relative w-20 h-20 mb-10">
+            <div id="introSpinner" class="absolute -inset-4 border-[3px] border-transparent border-t-accent rounded-full animate-spin-slow"></div>
+            <svg id="lockIcon" viewBox="0 0 24 24" class="w-full h-full fill-text-secondary transition-all duration-500">
+                <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+            </svg>
+        </div>
+        
+        <!-- Text -->
+        <div id="introText" class="font-mono text-lg text-text-secondary tracking-wider uppercase flex items-center gap-2 transition-all duration-500">
+            <span id="introMessage">Trying to make the connection</span>
+            <div id="introDots" class="flex gap-1">
+                <span class="w-1.5 h-1.5 bg-text-secondary rounded-full animate-pulse-dot dot-1"></span>
+                <span class="w-1.5 h-1.5 bg-text-secondary rounded-full animate-pulse-dot dot-2"></span>
+                <span class="w-1.5 h-1.5 bg-text-secondary rounded-full animate-pulse-dot dot-3"></span>
+            </div>
+            <div id="introCheckmark" class="w-6 h-6 opacity-0 scale-0 transition-all duration-400">
+                <svg viewBox="0 0 24 24" class="w-full h-full fill-success drop-shadow-[0_0_10px_rgba(74,222,128,0.3)]">
+                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                </svg>
+            </div>
+        </div>
+        
+        <!-- Progress Bar -->
+        <div class="w-52 h-[3px] bg-bg-tertiary rounded-full mt-8 overflow-hidden">
+            <div id="progressBar" class="h-full w-0 progress-gradient rounded-full transition-all duration-300"></div>
+        </div>
+    </div>
+
+    <!-- CHAT CONTAINER -->
+    <div id="chatContainer" class="w-full max-w-[520px] h-[85vh] max-h-[750px] bg-bg-secondary rounded-3xl border border-border-custom flex flex-col overflow-hidden shadow-[0_25px_80px_rgba(0,0,0,0.5),inset_0_0_0_1px_rgba(255,255,255,0.05)] opacity-0 translate-y-8 scale-[0.98] transition-all duration-600">
+        
+        <!-- Header -->
+        <div class="px-6 py-5 bg-bg-tertiary border-b border-border-custom flex items-center gap-3.5">
+            <div class="w-11 h-11 rounded-xl message-user-gradient flex items-center justify-center font-semibold text-lg shadow-[0_4px_15px_rgba(255,107,74,0.3)]">
+                RO
+            </div>
+            <div>
+                <h1 class="text-[17px] font-semibold tracking-tight">Chat RO-RO</h1>
+                <div id="statusContainer" class="text-[13px] text-text-secondary flex items-center gap-1.5">
+                    <span id="statusDot" class="w-2 h-2 bg-success rounded-full animate-pulse transition-all duration-500"></span>
+                    <span id="statusText">Online acum</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Messages Area -->
+        <div id="messagesArea" class="flex-1 overflow-y-auto p-6 flex flex-col gap-4 scroll-smooth scrollbar-thin">
+            
+            <!-- Date Divider -->
+            <div class="flex items-center gap-3 text-text-secondary text-xs my-2.5">
+                <span class="flex-1 h-px bg-border-custom"></span>
+                <span>Astăzi</span>
+                <span class="flex-1 h-px bg-border-custom"></span>
+            </div>
+        </div>
+
+        <!-- Choices Area (hidden by default) -->
+        <div id="choicesArea" class="px-6 py-4 bg-bg-tertiary border-t border-border-custom hidden">
+            <div id="choicesContainer" class="flex flex-col gap-2">
+                <!-- Choice buttons will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============ CONVERSATION FLOW ============
+        // Fiecare choice are: text (ce apare pe buton), response (ce răspunde bot-ul)
+        // Optional: nextQuestion (index-ul următoarei întrebări, pentru ramificări)
+        const conversationFlow = [
+            {
+                question: "Ethan, știu cine este criminalul.",
+                choices: [
+                    { 
+                        text: "Cine ești?", 
+                        response: "Nu contează asta acum... mă vor omorî." 
+                    },
+                  
+                    { 
+                        text: "De ce sa am incredere in tine?", 
+                        response: "Dar daca nu vei verifica si pista asta nu o sa l gasesti" 
+                    }
+                ]
+            },
+            {
+                question: "Nu pot sa ti zic direct, astfel vor stii ca am fost eu",
+                choices: [
+                    { 
+                        text: "De ce ar trebui să am încredere în tine?", 
+                        response: "Nu trebuie să ai. Dar dacă nu vii, vei regreta toată viața." 
+                    },
+                    { 
+                        text: "OK, voi fi acolo.", 
+                        response: "Bine. Vino singur. Și Ethan... nu spune nimănui." 
+                    },
+                    { 
+                        text: "Sun poliția.", 
+                        response: "Poliția? Ei sunt problema. Crezi că de ce nu s-a rezolvat cazul?" 
+                    }
+                ]
+            },
+            {
+                question: "Mai e ceva ce trebuie să știi... criminalul te cunoaște.",
+                choices: [
+                    { 
+                        text: "Cum adică mă cunoaște?!", 
+                        response: "Cineva din cercul tău. Cineva în care ai încredere." 
+                    },
+                    { 
+                        text: "Spune-mi numele!", 
+                        response: "Nu aici. Nu e sigur. La întâlnire îți arăt dovezile." 
+                    }
+                ]
+            },
+            {
+                question: "Am auzit ceva... trebuie să plec. Miezul nopții. Nu uita.",
+                choices: [
+                    { 
+                        text: "Așteaptă! Mai am întrebări!", 
+                        response: "Nu mai e timp. Vin după mine. Miezul nopții, Ethan." 
+                    },
+                    { 
+                        text: "Ai grijă de tine.", 
+                        response: "Tu ai grijă. Criminalul știe că ai început să cauți adevărul..." 
+                    }
+                ]
+            },
+            {
+                question: "[Conexiunea s-a întrerupt]",
+                connectionLost: true,
+                choices: []
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+
+        // ============ INTRO ANIMATION ============
+        const introScreen = document.getElementById('introScreen');
+        const introSpinner = document.getElementById('introSpinner');
+        const lockIcon = document.getElementById('lockIcon');
+        const introText = document.getElementById('introText');
+        const introMessage = document.getElementById('introMessage');
+        const introDots = document.getElementById('introDots');
+        const introCheckmark = document.getElementById('introCheckmark');
+        const progressBar = document.getElementById('progressBar');
+        const chatContainer = document.getElementById('chatContainer');
+
+        function runIntroAnimation() {
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += 2;
+                progressBar.style.width = Math.min(progress, 70) + '%';
+                if (progress >= 70) clearInterval(progressInterval);
+            }, 50);
+
+            setTimeout(() => {
+                introSpinner.classList.add('opacity-0');
+                introMessage.textContent = 'Connection Secure';
+                introDots.classList.add('hidden');
+                
+                introCheckmark.classList.remove('opacity-0', 'scale-0');
+                introCheckmark.classList.add('opacity-100', 'scale-100');
+                
+                lockIcon.classList.remove('fill-text-secondary');
+                lockIcon.classList.add('fill-success', 'drop-shadow-[0_0_20px_rgba(74,222,128,0.3)]');
+                
+                introText.classList.remove('text-text-secondary');
+                introText.classList.add('text-success', 'drop-shadow-[0_0_20px_rgba(74,222,128,0.3)]');
+                
+                progressBar.style.width = '100%';
+                
+                setTimeout(() => {
+                    introScreen.classList.add('opacity-0', 'invisible');
+                    chatContainer.classList.remove('opacity-0', 'translate-y-8', 'scale-[0.98]');
+                    chatContainer.classList.add('opacity-100', 'translate-y-0', 'scale-100');
+                    
+                    // Start conversation after chat appears
+                    setTimeout(() => {
+                        askQuestion();
+                    }, 500);
+                }, 1500);
+                
+            }, 2000);
+        }
+
+        window.addEventListener('load', runIntroAnimation);
+
+        // ============ CHAT FUNCTIONALITY ============
+        const messagesArea = document.getElementById('messagesArea');
+        const choicesArea = document.getElementById('choicesArea');
+        const choicesContainer = document.getElementById('choicesContainer');
+
+        function getCurrentTime() {
+            const now = new Date();
+            return now.getHours().toString().padStart(2, '0') + ':' + 
+                   now.getMinutes().toString().padStart(2, '0');
+        }
+
+        function addMessage(text, isSent = true) {
+            return new Promise((resolve) => {
+                const message = document.createElement('div');
+                message.className = `flex flex-col max-w-[80%] animate-message-in ${isSent ? 'self-end' : 'self-start'}`;
+                
+                if (isSent) {
+                    message.innerHTML = `
+                        <div class="px-[18px] py-3.5 message-user-gradient text-white rounded-[20px] rounded-br-md text-[15px] leading-relaxed shadow-[0_4px_20px_rgba(255,107,74,0.3)]">
+                            ${text}
+                        </div>
+                        <span class="text-[11px] text-text-secondary mt-1.5 font-mono text-right">${getCurrentTime()}</span>
+                    `;
+                } else {
+                    message.innerHTML = `
+                        <div class="px-[18px] py-3.5 bg-message-other rounded-[20px] rounded-bl-md border border-border-custom text-[15px] leading-relaxed">
+                            ${text}
+                        </div>
+                        <span class="text-[11px] text-text-secondary mt-1.5 font-mono">${getCurrentTime()}</span>
+                    `;
+                }
+                
+                messagesArea.appendChild(message);
+                messagesArea.scrollTop = messagesArea.scrollHeight;
+                resolve();
+            });
+        }
+
+        function showTypingIndicator() {
+            const typing = document.createElement('div');
+            typing.className = 'flex flex-col max-w-[80%] self-start';
+            typing.id = 'typingIndicator';
+            typing.innerHTML = `
+                <div class="flex gap-1.5 px-[18px] py-3.5 bg-message-other rounded-[20px] rounded-bl-md border border-border-custom w-fit">
+                    <span class="w-2 h-2 bg-text-secondary rounded-full animate-typing typing-dot-1"></span>
+                    <span class="w-2 h-2 bg-text-secondary rounded-full animate-typing typing-dot-2"></span>
+                    <span class="w-2 h-2 bg-text-secondary rounded-full animate-typing typing-dot-3"></span>
+                </div>
+            `;
+            messagesArea.appendChild(typing);
+            messagesArea.scrollTop = messagesArea.scrollHeight;
+        }
+
+        function removeTypingIndicator() {
+            const typing = document.getElementById('typingIndicator');
+            if (typing) typing.remove();
+        }
+
+        function showChoices(choices) {
+            choicesContainer.innerHTML = '';
+            
+            choices.forEach((choice, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'choice-btn w-full px-4 py-3 bg-bg-secondary border border-border-custom rounded-xl text-left text-[15px] text-text-primary hover:border-accent hover:bg-bg-tertiary animate-fade-in';
+                btn.style.animationDelay = `${index * 0.1}s`;
+                btn.textContent = choice.text;
+                btn.onclick = () => selectChoice(choice);
+                choicesContainer.appendChild(btn);
+            });
+            
+            choicesArea.classList.remove('hidden');
+            messagesArea.scrollTop = messagesArea.scrollHeight;
+        }
+
+        function hideChoices() {
+            choicesArea.classList.add('hidden');
+            choicesContainer.innerHTML = '';
+        }
+
+        function delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        function randomDelay(min = 1000, max = 2000) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function setOffline() {
+            const statusDot = document.getElementById('statusDot');
+            const statusText = document.getElementById('statusText');
+            
+            statusDot.classList.remove('bg-success', 'animate-pulse');
+            statusDot.classList.add('bg-red-500');
+            statusText.textContent = 'Offline';
+        }
+
+        function setOnline() {
+            const statusDot = document.getElementById('statusDot');
+            const statusText = document.getElementById('statusText');
+            
+            statusDot.classList.remove('bg-red-500');
+            statusDot.classList.add('bg-success', 'animate-pulse');
+            statusText.textContent = 'Online acum';
+        }
+
+        async function askQuestion() {
+            if (currentQuestionIndex >= conversationFlow.length) {
+                currentQuestionIndex = 0;
+            }
+            
+            const current = conversationFlow[currentQuestionIndex];
+            
+            // Check if connection is lost
+            if (current.connectionLost) {
+                setOffline();
+                await addMessage(current.question, false);
+                return; // Don't show choices, conversation ends
+            }
+            
+            // Show typing indicator
+            showTypingIndicator();
+            
+            // Wait 1-2 seconds
+            await delay(randomDelay(1000, 2000));
+            
+            // Remove typing and show message
+            removeTypingIndicator();
+            await addMessage(current.question, false);
+            
+            // Wait a bit then show choices
+            await delay(500);
+            if (current.choices && current.choices.length > 0) {
+                showChoices(current.choices);
+            }
+        }
+
+        async function selectChoice(choice) {
+            // Hide choices immediately
+            hideChoices();
+            
+            // Wait before showing user's message (send delay)
+            await delay(randomDelay(800, 1500));
+            
+            // Add user's choice as a message
+            await addMessage(choice.text, true);
+            
+            // Show the response to this specific choice
+            showTypingIndicator();
+            await delay(randomDelay(1000, 2000));
+            removeTypingIndicator();
+            await addMessage(choice.response, false);
+            
+            // Check for restart
+            if (choice.restart) {
+                currentQuestionIndex = 0;
+                setOnline(); // Reset status to online
+                await delay(1000);
+                await askQuestion();
+                return;
+            }
+            
+            // Check for custom next question (for branching)
+            if (choice.nextQuestion !== undefined) {
+                currentQuestionIndex = choice.nextQuestion;
+            } else {
+                // Move to next question
+                currentQuestionIndex++;
+            }
+            
+            // Wait and ask next question if available
+            if (currentQuestionIndex < conversationFlow.length) {
+                await delay(randomDelay(800, 1500));
+                await askQuestion();
+            }
+        }
+
+        messagesArea.scrollTop = messagesArea.scrollHeight;
+    </script>
+</body>
+</html>
