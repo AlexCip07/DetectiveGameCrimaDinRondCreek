@@ -14,6 +14,11 @@ const server = Bun.serve({
       path = "/Story/index.html";
     }
     
+    // Phone route
+    if (path === "/phone") {
+      path = "/phone/index.html";
+    }
+    
     // Try to serve the file
     const filePath = "." + path;
     const file = Bun.file(filePath);
