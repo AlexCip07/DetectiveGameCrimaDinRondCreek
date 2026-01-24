@@ -29,10 +29,14 @@ export const GET: RequestHandler = async ({ url }) => {
 
 // POST /api/users - Create a new user
 export const POST: RequestHandler = async ({ request }) => {
-	const { username, email } = await request.json();
+	const { username, password, email } = await request.json();
 	
 	if (!username || typeof username !== 'string') {
 		return json({ error: 'Username is required' }, { status: 400 });
+	}
+	
+	if (!password || typeof password !== 'string') {
+		return json({ error: 'Password is required' }, { status: 400 });
 	}
 	
 	// Check if user already exists
@@ -42,7 +46,7 @@ export const POST: RequestHandler = async ({ request }) => {
 	}
 	
 	try {
-		const id = createUser(username.trim(), email?.trim());
+		const id = createUser(username.trim(), password, email?.trim());
 		return json({ id, username, email }, { status: 201 });
 	} catch (error) {
 		return json({ error: 'Failed to create user' }, { status: 500 });
