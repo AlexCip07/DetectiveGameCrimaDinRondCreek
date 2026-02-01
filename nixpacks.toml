@@ -1,3 +1,9 @@
+[variables]
+NODE_VERSION = "18"
+
+[phases.setup]
+nixPkgs = ["python3"]
+
 [phases.install]
 cmds = ["cd svelte-app && npm ci"]
 
