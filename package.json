@@ -9,9 +9,5 @@
   "engines": {
     "node": ">=18"
   },
-  "dependencies": {
-    "better-sqlite3": "^12.6.2",
-    "drizzle-kit": "^0.31.8",
-    "drizzle-orm": "^0.45.1"
-  }
+  "dependencies": {}
 }
