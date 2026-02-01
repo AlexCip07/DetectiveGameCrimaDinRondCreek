@@ -1,0 +1,11 @@
+[phases.setup]
+nixPkgs = ["nodejs_18", "npm"]
+
+[phases.install]
+cmds = ["cd svelte-app && npm ci"]
+
+[phases.build]
+cmds = ["cd svelte-app && npm run build"]
+
+[start]
+cmd = "cd svelte-app && node build"
