@@ -5,7 +5,7 @@ NIXPACKS_NODE_VERSION = "20"
 nixPkgs = ["nodejs_20", "python3"]
 
 [phases.install]
-cmds = ["cd svelte-app && npm ci"]
+cmds = ["cd svelte-app && rm -rf node_modules package-lock.json && npm install"]
 
 [phases.build]
 cmds = ["cd svelte-app && npm run build"]
