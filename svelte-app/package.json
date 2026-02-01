@@ -13,7 +13,7 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
 	},
 	"engines": {
-		"node": "18.x"
+		"node": ">=20"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^7.0.0",
@@ -32,7 +32,7 @@
 	},
 	"dependencies": {
 		"@sveltejs/adapter-node": "^5.5.2",
-		"better-sqlite3": "^9.6.0",
+		"better-sqlite3": "^11.0.0",
 		"drizzle-orm": "^0.45.1"
 	}
 }
