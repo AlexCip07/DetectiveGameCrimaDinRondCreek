@@ -257,7 +257,10 @@
         // App click handler
         function openApp(appName) {
             console.log(`Opening ${appName}...`);
-            // You can add navigation or modal logic here
+            
+            if (appName === 'messages') {
+                window.location.href = 'Apps/Messages/index.html';
+            }
         }
     </script>
 </body>

@@ -1,22 +1,12 @@
 const server = Bun.serve({
-  port: process.env.PORT || 3000,
+  port: process.env.PORT || 5173,
   async fetch(req) {
     const url = new URL(req.url);
     let path = url.pathname;
     
     // Default to index.html
     if (path === "/") {
-      path = "/ro-ro/index.html";
-    }
-    
-    // Story route
-    if (path === "/story") {
-      path = "/Story/index.html";
-    }
-    
-    // Phone route
-    if (path === "/phone") {
-      path = "/phone/index.html";
+      path = "/index.html";
     }
     
     // Try to serve the file

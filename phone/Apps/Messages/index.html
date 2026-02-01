@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mesaje</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        .phone-frame {
+            background: linear-gradient(145deg, #1a1a1a 0%, #0d0d0d 100%);
+            box-shadow: 
+                0 50px 100px rgba(0, 0, 0, 0.5),
+                0 0 0 2px #2a2a2a,
+                inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+        }
+        .phone-screen {
+            background: #000;
+        }
+        .notch {
+            background: #000;
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+        }
+        .home-indicator {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        .message-bubble-sent {
+            background: linear-gradient(135deg, #007AFF 0%, #0055D4 100%);
+            border-radius: 20px 20px 4px 20px;
+        }
+        .message-bubble-received {
+            background: #2C2C2E;
+            border-radius: 20px 20px 20px 4px;
+        }
+        .conversation-item {
+            transition: all 0.15s ease;
+        }
+        .conversation-item:active {
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(0.98);
+        }
+        .avatar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .view-transition {
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        .typing-indicator span {
+            animation: bounce 1.4s infinite ease-in-out;
+        }
+        .typing-indicator span:nth-child(1) { animation-delay: 0s; }
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes bounce {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-4px); }
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .input-container {
+            background: rgba(28, 28, 30, 0.95);
+            backdrop-filter: blur(20px);
+        }
+    </style>
+</head>
+<body class="font-inter bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 min-h-screen flex justify-center items-center p-5">
+    
+    <!-- Phone Frame -->
+    <div class="phone-frame rounded-[55px] p-3 relative">
+        
+        <!-- Phone Screen -->
+        <div class="phone-screen w-[375px] h-[812px] rounded-[45px] overflow-hidden relative">
+            
+            <!-- Status Bar -->
+            <div class="absolute top-0 left-0 right-0 z-50 flex justify-between items-center px-8 pt-4 text-white text-sm font-medium bg-gradient-to-b from-black/80 to-transparent pb-6">
+                <span id="time" class="text-[15px]">21:37</span>
+                
+                <!-- Notch -->
+                <div class="notch absolute left-1/2 -translate-x-1/2 top-0 w-[120px] h-[35px] rounded-b-3xl flex items-center justify-center gap-2">
+                    <div class="w-2 h-2 rounded-full bg-gray-800 ring-1 ring-gray-700"></div>
+                    <div class="w-16 h-4 rounded-full bg-gray-900"></div>
+                </div>
+                
+                <div class="flex items-center gap-1.5">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M2 17h2v4H2v-4zm4-5h2v9H6v-9zm4-4h2v13h-2V8zm4-4h2v17h-2V4zm4-2h2v19h-2V2z"/>
+                    </svg>
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 18c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm-4.9-2.3l1.4 1.4C9.4 18 10.6 18.5 12 18.5s2.6-.5 3.5-1.4l1.4-1.4c-1.3-1.3-3.1-2.1-4.9-2.1s-3.6.8-4.9 2.1zM12 10c-3 0-5.7 1.2-7.7 3.2l1.4 1.4c1.6-1.6 3.8-2.6 6.3-2.6s4.7 1 6.3 2.6l1.4-1.4C17.7 11.2 15 10 12 10zm0-4c-4.1 0-7.9 1.6-10.8 4.3l1.4 1.4C5.2 9.2 8.4 8 12 8s6.8 1.2 9.4 3.7l1.4-1.4C19.9 7.6 16.1 6 12 6z"/>
+                    </svg>
+                    <div class="flex items-center gap-0.5">
+                        <div class="w-6 h-3 border border-white rounded-sm flex items-center p-0.5">
+                            <div class="w-4 h-1.5 bg-green-500 rounded-sm"></div>
+                        </div>
+                        <div class="w-0.5 h-1.5 bg-white rounded-r-sm"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Conversations List View -->
+            <div id="conversationsView" class="view-transition absolute inset-0 bg-black">
+                
+                <!-- Header -->
+                <div class="pt-14 px-4 pb-2">
+                    <div class="flex items-center justify-between mb-4">
+                        <button onclick="goHome()" class="text-blue-500 text-sm font-medium flex items-center gap-1">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                            </svg>
+                        </button>
+                        <h1 class="text-white text-2xl font-bold">Mesaje</h1>
+                        <button class="text-blue-500">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <!-- Search Bar -->
+                    <div class="relative">
+                        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                        <input type="text" placeholder="Caută" class="w-full bg-gray-800/80 text-white placeholder-gray-500 rounded-xl py-2 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+
+                <!-- Conversations List -->
+                <div class="overflow-y-auto scrollbar-hide" style="height: calc(100% - 180px);">
+                    
+                    <div class="conversation-item flex items-center gap-3 px-4 py-3 cursor-pointer" onclick="openChat('maria')">
+                        <div class="relative">
+                            <div class="avatar w-14 h-14 rounded-full flex items-center justify-center text-white font-semibold text-lg">M</div>
+                            <div class="absolute bottom-0 right-0 w-4 h-4 bg-green-500 rounded-full border-2 border-black"></div>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-white font-semibold">Maria</h3>
+                                <span class="text-gray-500 text-xs">acum 2m</span>
+                            </div>
+                            <p class="text-gray-400 text-sm truncate">Apasă pentru a trimite un mesaj</p>
+                        </div>
+                    </div>
+
+                    <div class="conversation-item flex items-center gap-3 px-4 py-3 cursor-pointer" onclick="openChat('alex')">
+                        <div class="relative">
+                            <div class="avatar w-14 h-14 rounded-full flex items-center justify-center text-white font-semibold text-lg" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">A</div>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-white font-semibold">Alex</h3>
+                                <span class="text-gray-500 text-xs">10:42</span>
+                            </div>
+                            <p class="text-gray-400 text-sm truncate">Apasă pentru a trimite un mesaj</p>
+                        </div>
+                    </div>
+
+                    <div class="conversation-item flex items-center gap-3 px-4 py-3 cursor-pointer" onclick="openChat('grup')">
+                        <div class="relative">
+                            <div class="avatar w-14 h-14 rounded-full flex items-center justify-center text-white font-semibold text-lg" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                                <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-6 6v-2c0-2.21 3.58-4 8-4s8 1.79 8 4v2H6z"/>
+                                </svg>
+                            </div>
+                            <div class="absolute bottom-0 right-0 w-4 h-4 bg-green-500 rounded-full border-2 border-black"></div>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-white font-semibold">Prieteni</h3>
+                                <span class="text-gray-500 text-xs">ieri</span>
+                            </div>
+                            <p class="text-gray-400 text-sm truncate">Apasă pentru a trimite un mesaj</p>
+                        </div>
+                    </div>
+
+                    <div class="conversation-item flex items-center gap-3 px-4 py-3 cursor-pointer" onclick="openChat('mama')">
+                        <div class="relative">
+                            <div class="avatar w-14 h-14 rounded-full flex items-center justify-center text-white font-semibold text-lg" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">M</div>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-white font-semibold">Mama</h3>
+                                <span class="text-gray-500 text-xs">ieri</span>
+                            </div>
+                            <p class="text-gray-400 text-sm truncate">Apasă pentru a trimite un mesaj</p>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Chat View -->
+            <div id="chatView" class="view-transition absolute inset-0 bg-black translate-x-full opacity-0">
+                
+                <!-- Chat Header -->
+                <div class="absolute top-0 left-0 right-0 z-40 bg-black/90 backdrop-blur-xl border-b border-gray-800/50">
+                    <div class="pt-14 px-4 pb-3">
+                        <div class="flex items-center gap-3">
+                            <button onclick="closeChat()" class="text-blue-500 flex items-center gap-1">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                                </svg>
+                            </button>
+                            <div class="flex items-center gap-3 flex-1">
+                                <div class="relative">
+                                    <div id="chatAvatar" class="avatar w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold">M</div>
+                                    <div id="chatOnlineIndicator" class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-black"></div>
+                                </div>
+                                <div>
+                                    <h2 id="chatName" class="text-white font-semibold">Maria</h2>
+                                    <p id="chatStatus" class="text-green-500 text-xs">online</p>
+                                </div>
+                            </div>
+                            <button class="text-blue-500 p-2">
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+                                </svg>
+                            </button>
+                            <button class="text-blue-500 p-2">
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Messages Container -->
+                <div id="messagesContainer" class="absolute inset-0 overflow-y-auto scrollbar-hide pt-28 pb-20 px-4">
+                    
+                    <div id="messagesList" class="flex flex-col gap-2">
+                        
+                        <!-- Date Separator -->
+                        <div class="flex justify-center my-4">
+                            <span class="text-gray-500 text-xs bg-gray-800/50 px-3 py-1 rounded-full">Astăzi</span>
+                        </div>
+
+                        <!-- Empty state -->
+                        <div id="emptyState" class="flex flex-col items-center justify-center py-20 text-center">
+                            <div class="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mb-4">
+                                <svg class="w-8 h-8 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+                                </svg>
+                            </div>
+                            <p class="text-gray-500 text-sm">Niciun mesaj încă</p>
+                            <p class="text-gray-600 text-xs mt-1">Trimite primul mesaj!</p>
+                        </div>
+
+                        <!-- Typing Indicator -->
+                        <div id="typingIndicator" class="flex justify-start hidden">
+                            <div class="message-bubble-received px-4 py-3">
+                                <div class="typing-indicator flex gap-1">
+                                    <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
+                                    <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
+                                    <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Message Input -->
+                <div class="absolute bottom-0 left-0 right-0 input-container border-t border-gray-800/50 px-4 py-3 pb-8">
+                    <div class="flex items-center gap-2">
+                        <button class="text-blue-500 p-2">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                            </svg>
+                        </button>
+                        <button class="text-blue-500 p-2">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 15.2c1.77 0 3.2-1.43 3.2-3.2S13.77 8.8 12 8.8 8.8 10.23 8.8 12s1.43 3.2 3.2 3.2zM9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/>
+                            </svg>
+                        </button>
+                        <div class="flex-1 relative">
+                            <input 
+                                type="text" 
+                                id="messageInput"
+                                placeholder="Mesaj" 
+                                class="w-full bg-gray-800 text-white placeholder-gray-500 rounded-full py-2 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                onkeypress="handleKeyPress(event)"
+                            >
+                            <button class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <button onclick="sendMessage()" class="bg-blue-500 hover:bg-blue-600 text-white w-9 h-9 rounded-full flex items-center justify-center transition-colors">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Home Indicator -->
+            <div class="absolute bottom-2 left-1/2 -translate-x-1/2 z-50">
+                <div class="home-indicator w-36 h-1 rounded-full"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Update time
+        function updateTime() {
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            document.getElementById('time').textContent = `${hours}:${minutes}`;
+        }
+        updateTime();
+        setInterval(updateTime, 1000);
+
+        // Chat data
+        const chats = {
+            maria: {
+                name: 'Maria',
+                avatar: 'M',
+                gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                online: true,
+                status: 'online'
+            },
+            alex: {
+                name: 'Alex',
+                avatar: 'A',
+                gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                online: false,
+                status: 'ultima dată azi la 10:42'
+            },
+            grup: {
+                name: 'Prieteni',
+                avatar: '👥',
+                gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                online: true,
+                status: '3 online'
+            },
+            mama: {
+                name: 'Mama',
+                avatar: 'M',
+                gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+                online: false,
+                status: 'ultima dată ieri la 21:30'
+            }
+        };
+
+        let messageCount = 0;
+
+        // Open chat
+        function openChat(chatId) {
+            const chat = chats[chatId];
+            if (!chat) return;
+
+            document.getElementById('chatName').textContent = chat.name;
+            document.getElementById('chatAvatar').textContent = chat.avatar;
+            document.getElementById('chatAvatar').style.background = chat.gradient;
+            document.getElementById('chatStatus').textContent = chat.status;
+            document.getElementById('chatStatus').className = chat.online ? 'text-green-500 text-xs' : 'text-gray-500 text-xs';
+            document.getElementById('chatOnlineIndicator').style.display = chat.online ? 'block' : 'none';
+
+            const conversationsView = document.getElementById('conversationsView');
+            const chatView = document.getElementById('chatView');
+
+            conversationsView.style.transform = 'translateX(-100%)';
+            conversationsView.style.opacity = '0';
+            chatView.style.transform = 'translateX(0)';
+            chatView.style.opacity = '1';
+
+            // Scroll to bottom
+            setTimeout(() => {
+                const container = document.getElementById('messagesContainer');
+                container.scrollTop = container.scrollHeight;
+            }, 100);
+        }
+
+        // Close chat
+        function closeChat() {
+            const conversationsView = document.getElementById('conversationsView');
+            const chatView = document.getElementById('chatView');
+
+            conversationsView.style.transform = 'translateX(0)';
+            conversationsView.style.opacity = '1';
+            chatView.style.transform = 'translateX(100%)';
+            chatView.style.opacity = '0';
+        }
+
+        // Go home
+        function goHome() {
+            window.location.href = '../../index.html';
+        }
+
+        // Send message
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            if (!message) return;
+
+            // Hide empty state
+            const emptyState = document.getElementById('emptyState');
+            if (emptyState) emptyState.style.display = 'none';
+
+            const container = document.getElementById('messagesList');
+            const now = new Date();
+            const time = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+
+            const messageEl = document.createElement('div');
+            messageEl.className = 'flex justify-end';
+            messageEl.innerHTML = `
+                <div class="message-bubble-sent px-4 py-2 max-w-[75%]">
+                    <p class="text-white text-sm">${escapeHtml(message)}</p>
+                    <div class="flex items-center justify-end gap-1 mt-1">
+                        <span class="text-blue-200 text-[10px]">${time}</span>
+                        <svg class="w-3 h-3 text-blue-200" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                        </svg>
+                    </div>
+                </div>
+            `;
+
+            // Insert before typing indicator
+            const typingIndicator = document.getElementById('typingIndicator');
+            container.insertBefore(messageEl, typingIndicator);
+
+            input.value = '';
+            messageCount++;
+
+            // Scroll to bottom
+            const scrollContainer = document.getElementById('messagesContainer');
+            scrollContainer.scrollTop = scrollContainer.scrollHeight;
+
+            // Show typing indicator and simulate response
+            setTimeout(() => {
+                typingIndicator.classList.remove('hidden');
+                scrollContainer.scrollTop = scrollContainer.scrollHeight;
+
+                setTimeout(() => {
+                    typingIndicator.classList.add('hidden');
+                    
+                    const responses = [
+                        'Ok! 👍',
+                        'Super, mulțumesc!',
+                        'Am înțeles.',
+                        'Perfect! 😊',
+                        'Bine, ne auzim!',
+                        'La fel! 🎉'
+                    ];
+                    const response = responses[Math.floor(Math.random() * responses.length)];
+
+                    const responseEl = document.createElement('div');
+                    responseEl.className = 'flex justify-start';
+                    responseEl.innerHTML = `
+                        <div class="message-bubble-received px-4 py-2 max-w-[75%]">
+                            <p class="text-white text-sm">${response}</p>
+                            <span class="text-gray-500 text-[10px] mt-1 block">${time}</span>
+                        </div>
+                    `;
+                    container.insertBefore(responseEl, typingIndicator);
+                    scrollContainer.scrollTop = scrollContainer.scrollHeight;
+                }, 1500 + Math.random() * 1000);
+            }, 500);
+        }
+
+        // Handle enter key
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        // Escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>

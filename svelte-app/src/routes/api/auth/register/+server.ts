@@ -1,5 +1,5 @@
 import { json } from '@sveltejs/kit';
-import { createUser, getUserByUsername } from '$lib/db';
+import { createUser, getUserByUsername, createTutorialContact } from '$lib/db';
 import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ request }) => {
@@ -25,6 +25,12 @@ export const POST: RequestHandler = async ({ request }) => {
 
 	try {
 		const userId = createUser(username.trim(), password);
+		
+		// Create Tutorial contact with welcome message for new users
+		if (userId) {
+			createTutorialContact(Number(userId));
+		}
+		
 		return json({ 
 			success: true, 
 			user: { id: userId, username } 

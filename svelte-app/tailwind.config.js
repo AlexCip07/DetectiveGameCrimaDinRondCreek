@@ -3,6 +3,9 @@ export default {
   content: ['./src/**/*.{html,js,svelte,ts}'],
   theme: {
     extend: {
+      screens: {
+        'xs': '480px',
+      },
       colors: {
         'bg-primary': '#0a0a0f',
         'bg-secondary': '#12121a',
