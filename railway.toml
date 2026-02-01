@@ -1,6 +1,6 @@
 [build]
 builder = "nixpacks"
-watchPatterns = ["svelte-app/**"]
+watchPatterns = ["**"]
 
 [deploy]
 startCommand = "cd svelte-app && node build"
